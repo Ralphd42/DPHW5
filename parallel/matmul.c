@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<omp.h>
 #include<string.h>
 #include "timing.h"
 
@@ -21,6 +22,7 @@ void DisplayArray( FILE * outLocation, double * arr, int rowcolLen)
 
 void doMatMul( double * arrA, double * arrB, double * arrC ,int rowcolLen)   
 {
+    #pragma omp parallel for
     for (int i = 0;i<rowcolLen;++i)
     {
         for(int  j = 0;j<rowcolLen;++j)
@@ -81,6 +83,7 @@ void InitArray(double * arr, int rowcolLen)
 int main(int argc, char*argv[])
 {
     timing_start();
+    omp_set_num_threads(9);
     int arrdim =0;
     if(argc<2)
     {
@@ -109,16 +112,16 @@ int main(int argc, char*argv[])
     FIllArray(q,matB,arrdim);
      
     InitArray(matC,arrdim);
-// add parallel for loop here
 
     doMatMul( matA, matB, matC ,arrdim);
-
-    //printf("----------------------------------------------------\n");
-    //DisplayArray(stdout,matA,arrdim);
-    //printf("----------------------------------------------------\n");
-    //DisplayArray(stdout,matB,arrdim);
-    //printf("----------------------------------------------------\n");
-   // DisplayArray(stdout,matC,arrdim);
+/*
+    printf("----------------------------------------------------\n");
+    DisplayArray(stdout,matA,arrdim);
+    printf("----------------------------------------------------\n");
+    DisplayArray(stdout,matB,arrdim);
+    printf("----------------------------------------------------\n");
+    DisplayArray(stdout,matC,arrdim);
+  */  
     // deallocate the three
 
 
