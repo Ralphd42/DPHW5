@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -fopenmp
+CFLAGS = -Wall -fopenmp -std99
 LDFLAGS = 
 OBJFILES = matmul.o timing.o
 TARGET = part_1_parallel.out
