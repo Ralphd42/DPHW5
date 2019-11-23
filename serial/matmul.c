@@ -21,17 +21,27 @@ void DisplayArray( FILE * outLocation, double * arr, int rowcolLen)
 
 void doMatMul( double * arrA, double * arrB, double * arrC ,int rowcolLen)   
 {
+     
+    timing_start();
+    
     for (int i = 0;i<rowcolLen;++i)
     {
         for(int  j = 0;j<rowcolLen;++j)
         {
             for(int k=0;k<rowcolLen;++k)
             {
-                arrC[i*rowcolLen + j]  = arrC[i*rowcolLen + j]  +   
-                arrA[i * rowcolLen +k] * arrB[k*rowcolLen +j];
+                 
+                *(arrC +i*rowcolLen + j)  = 
+                    *(arrC + i * rowcolLen + j)  +   
+                    *(arrA + i * rowcolLen + k) *  
+                    *(arrB + k * rowcolLen + j);
+                 
             }
         }
     }
+     
+    timing_stop();
+    print_timing();
 }
 
 /*Fill Arrays    */
@@ -80,7 +90,6 @@ void InitArray(double * arr, int rowcolLen)
 
 int main(int argc, char*argv[])
 {
-    timing_start();
     int arrdim =0;
     if(argc<2)
     {
@@ -88,30 +97,37 @@ int main(int argc, char*argv[])
         exit(-1);
     }
     char * filename= argv[1];
-     
-    // get dimentions of array
     FILE *q;
     q = fopen(filename, "r");
-
     fscanf(q,"%d", &arrdim);
-    printf("%d\r\n",arrdim);
+    printf("Arr dim %d\r\n",arrdim);
     int numElements = arrdim*arrdim;
     // matrixes
     double * matA   =((double *) malloc(sizeof(double)*numElements));
     double * matB   =((double *) malloc(sizeof(double)*numElements));
     double * matC   =((double *) malloc(sizeof(double)*numElements));
-    
-    // Allcate 3 arrays
-
-    // load the matrixes
     FIllArray(q,matA,arrdim);
-     
     FIllArray(q,matB,arrdim);
-     
     InitArray(matC,arrdim);
-// add parallel for loop here
-
     doMatMul( matA, matB, matC ,arrdim);
+    FILE * Output;
+    char * outfileName ="outFile.txt";
+    Output = fopen(outfileName, "w");
+    DisplayArray(Output,matC,arrdim);
+    free(matA  );
+    free(matB  );
+    free(matC  );
+    fclose(q);
+    fclose(Output);
+    return 1;
+}
+
+
+
+
+
+
+
 
     //printf("----------------------------------------------------\n");
     //DisplayArray(stdout,matA,arrdim);
@@ -120,13 +136,4 @@ int main(int argc, char*argv[])
     //printf("----------------------------------------------------\n");
    // DisplayArray(stdout,matC,arrdim);
     // deallocate the three
-
-
-    free(matA  );
-    free(matB  );
-    free(matC  );
-    fclose(q);
-    timing_stop();
-    print_timing();
-    return 1;
-}
+    
